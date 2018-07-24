@@ -84,6 +84,8 @@ class HMCWrapperTemplate: public HMCRunnerBase<ReaderClass> {
     if (GridCmdOptionExists(argv, argv + argc, "--StartingType")) {
       arg = GridCmdOptionPayload(argv, argv + argc, "--StartingType");
 
+      //DMH
+      // Added a Conversion CLI
       if (arg != "HotStart" &&
 	  arg != "ColdStart" &&
 	  arg != "TepidStart" &&
