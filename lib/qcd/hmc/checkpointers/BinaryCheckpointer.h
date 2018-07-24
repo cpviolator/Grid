@@ -110,7 +110,86 @@ class BinaryHmcCheckpointer : public BaseHmcCheckpointer<Impl> {
               << " checksums " << std::hex << nersc_csum<<"/"<<scidac_csuma<<"/"<<scidac_csumb 
 	      << std::dec << std::endl;
   };
-};
+
+  //DMH
+  // Caveat!! Only gives sensible results in serial
+  void Checkpoint5DTo4DConvert(int traj, Field &U, GridSerialRNG &sRNG, GridParallelRNG &pRNG) {
+    
+    //Read 5D lattice
+    std::string config, rng;
+    this->build_filenames(traj, Params, config, rng);
+    this->check_filename(rng);
+    this->check_filename(config);
+
+    BinarySimpleMunger<sobj_double, sobj> munge;
+
+    uint32_t nersc_csum;
+    uint32_t scidac_csuma;
+    uint32_t scidac_csumb;
+    BinaryIO::readRNG(sRNG, pRNG, rng, 0,nersc_csum,scidac_csuma,scidac_csumb);
+    BinaryIO::readLatticeObject<vobj, sobj_double>(U, config, munge, 0, Params.format,
+                                                   nersc_csum,scidac_csuma,scidac_csumb);
+
+    std::cout << GridLogMessage << "Read Binary Configuration " << config
+              << " checksums " << std::hex << nersc_csum<<"/"<<scidac_csuma<<"/"<<scidac_csumb
+              << std::dec << std::endl;
+
+    //Strip to Ls, 4D lattices.
+    int Ls = U._grid->_fdimensions[4];
+    std::vector<int> latt;
+    std::vector<int> simd;
+    std::vector<int> mpi;
+
+    //MPI query
+    int MPI_sum = 1;
+    for(int i=0; i<Nd; i++) {
+      MPI_sum *= U._grid->_processors[i];
+    }
+
+    if(MPI_sum == 1) {
+
+      for(int i=0; i<4; i++) {
+        latt.push_back(U._grid->_fdimensions[i]);
+        simd.push_back(U._grid->_simd_layout[i]);
+        mpi.push_back(U._grid->_processors[i]);
+      }
+
+      GridBase *grid4d = SpaceTimeGrid::makeFourDimGrid(latt, simd, mpi);
+
+      Lattice<vobj> U4(grid4d);
+
+      uint32_t nersc_csum;
+      uint32_t scidac_csuma;
+      uint32_t scidac_csumb;
+
+      truncate(config);
+
+      for(int i=0; i<Ls; i++) {
+	
+        this->build_filenames5D(i, traj, Params, config, rng);
+        ExtractSlice(U4, U, i, 4);
+        truncate(config);
+
+        U4._grid->show_decomposition();
+
+        BinarySimpleUnmunger<sobj_double, sobj> munge4;
+        BinaryIO::writeLatticeObject<vobj, sobj_double>(U4, config, munge4, 0,
+                                                        Params.format,
+                                                        nersc_csum, scidac_csuma,
+                                                        scidac_csumb);
+
+      }
+
+      //'re'dump the 5D lattice.
+      this->build_filenames(traj, Params, config, rng);
+      BinaryIO::writeLatticeObject<vobj, sobj_double>(U, config, munge, 0,
+                                                      Params.format,
+                                                      nersc_csum, scidac_csuma,
+                                                      scidac_csumb);
+    }
+  };
+  
+ };
 }
 }
 #endif

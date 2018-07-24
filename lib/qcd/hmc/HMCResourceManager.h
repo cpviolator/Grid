@@ -197,6 +197,15 @@ class HMCResourceManager {
     std::cout << GridLogMessage << "::::::::::::::::::::::::::::::::::::::::" <<std::endl;
   }
 
+  //DMH
+  // Add a named grid set, 5d shortcut
+  void AddFiveDimGrid(const std::string s) {
+    //Use the existing FourDim module,
+    //Pass a boolean to instantiate 5D
+    GridFourDimModule<vComplex> Mod(true);
+    AddGrid(s, Mod);
+  }
+  
   // Add a named grid set, 4d shortcut
   void AddFourDimGrid(const std::string s) {
     GridFourDimModule<vComplex> Mod;

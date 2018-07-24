@@ -37,6 +37,11 @@ directory
 namespace Grid {
 namespace QCD {
 
+//DMH                                                                                                                                                                           
+typedef WilsonGaugeAction5D<PeriodicGimplR>  WilsonGaugeAction5DR;
+typedef WilsonGaugeAction5D<PeriodicGimplF>  WilsonGaugeAction5DF;
+typedef WilsonGaugeAction5D<PeriodicGimplD>  WilsonGaugeAction5DD;
+  
 typedef WilsonGaugeAction<PeriodicGimplR>          WilsonGaugeActionR;
 typedef WilsonGaugeAction<PeriodicGimplF>          WilsonGaugeActionF;
 typedef WilsonGaugeAction<PeriodicGimplD>          WilsonGaugeActionD;

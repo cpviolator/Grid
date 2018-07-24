@@ -225,7 +225,6 @@ class HybridMonteCarlo {
       double t1=usecond();
       std::cout << GridLogMessage << "Total time for trajectory (s): " << (t1-t0)/1e6 << std::endl;
 
-
       for (int obs = 0; obs < Observables.size(); obs++) {
       	std::cout << GridLogDebug << "Observables # " << obs << std::endl;
       	std::cout << GridLogDebug << "Observables total " << Observables.size() << std::endl;

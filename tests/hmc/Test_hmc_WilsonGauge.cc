@@ -41,20 +41,24 @@ int main(int argc, char **argv) {
   typedef GenericHMCRunner<MinimumNorm2> HMCWrapper;  // Uses the default minimum norm
   HMCWrapper TheHMC;
 
+  // DMH: Construct a Five Dim Grid
   // Grid from the command line
-  TheHMC.Resources.AddFourDimGrid("gauge");
+  TheHMC.Resources.AddFiveDimGrid("gauge");
   // Possibile to create the module by hand 
   // hardcoding parameters or using a Reader
 
-
+  // DMH: Get information about the 5D grid.
+  auto UGrid = TheHMC.Resources.GetCartesian("gauge");
+  
   // Checkpointer definition
   CheckpointerParameters CPparams;  
   CPparams.config_prefix = "ckpoint_lat";
   CPparams.rng_prefix = "ckpoint_rng";
-  CPparams.saveInterval = 1;
+  CPparams.saveInterval = 10;
   CPparams.format = "IEEE64BIG";
   
-  TheHMC.Resources.LoadNerscCheckpointer(CPparams);
+  //DMH: Binary data is simpler to hack.
+  TheHMC.Resources.LoadBinaryCheckpointer(CPparams);
 
   RNGModuleParameters RNGpar;
   RNGpar.serial_seeds = "1 2 3 4 5";
@@ -66,23 +70,32 @@ int main(int argc, char **argv) {
   typedef PlaquetteMod<HMCWrapper::ImplPolicy> PlaqObs;
   typedef TopologicalChargeMod<HMCWrapper::ImplPolicy> QObs;
   TheHMC.Resources.AddObservable<PlaqObs>();
+  /*
   TopologyObsParameters TopParams;
   TopParams.interval = 5;
-  TopParams.do_smearing = true;
+  TopParams.do_smearing = false; //DMH: We do physics on the 4D slices
   TopParams.Smearing.steps = 200;
   TopParams.Smearing.step_size = 0.01;
   TopParams.Smearing.meas_interval = 50;
   TopParams.Smearing.maxTau = 2.0; 
   TheHMC.Resources.AddObservable<QObs>(TopParams);
+  */
   //////////////////////////////////////////////
 
-  /////////////////////////////////////////////////////////////
-  // Collect actions, here use more encapsulation
-  // need wrappers of the fermionic classes 
-  // that have a complex construction
-  // standard
-  RealD beta = 5.6 ;
-  WilsonGaugeActionR Waction(beta);
+  // Gauge action
+  int Ls = UGrid->_fdimensions[4]; //DMH: Get the 5D extent from the Grid.
+  RealD Beta = 4.95; //DMH: A default value
+  Beta = atof(argv[1]);
+  
+  std::vector<RealD> betat(Ls,Beta);
+  std::vector<RealD> betas(Ls,Beta);
+  betat[Ls-1]= 0.0;  // for the open boundary conditions
+  // Specify here the slab betas
+  //betas={5.2,5.5,5.8,6,6,5.8,5.5,5.2};
+  //betat={4.0, 4.5, 5.0, 5.6, 5.6, 5.0, 4.5, 4.0};
+  std::cout << GridLogMessage << "Betas: " << betas << std::endl;
+  std::cout << GridLogMessage << "Betat: " << betat << std::endl;
+  WilsonGaugeAction5DR Waction(betas, betat, UGrid);
   
   ActionLevel<HMCWrapper::Field> Level1(1);
   Level1.push_back(&Waction);
@@ -95,8 +108,9 @@ int main(int argc, char **argv) {
   TheHMC.Parameters.MD.trajL   = 1.0;
 
   TheHMC.ReadCommandLine(argc, argv); // these can be parameters from file
-  TheHMC.Run();  // no smearing
 
+  TheHMC.Run();  // no smearing
+  
   Grid_finalize();
 
 } // main

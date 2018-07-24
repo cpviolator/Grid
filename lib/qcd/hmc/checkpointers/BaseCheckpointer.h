@@ -74,8 +74,26 @@ class BaseHmcCheckpointer : public HmcObservable<typename Impl::Field> {
       os << Params.config_prefix << "." << traj;
       conf_file = os.str();
     }
- 	} 
+  } 
 
+  //DMH
+  // Construct the names of the 4D slices... a 5D build special, hence the
+  // 5D in the name.
+  void build_filenames5D(int slice, int traj, CheckpointerParameters &Params,
+                         std::string &conf_file, std::string &rng_file) {
+    {
+      std::ostringstream os;
+      os << Params.rng_prefix << "-" << slice << "." << traj;
+      rng_file = os.str();
+    }
+    
+    {
+      std::ostringstream os;
+      os << Params.config_prefix << "-" << slice << "." << traj;
+      conf_file = os.str();
+    }
+  }
+  
   void check_filename(const std::string &filename){
     std::ifstream f(filename.c_str());
     if(!f.good()){
@@ -90,6 +108,10 @@ class BaseHmcCheckpointer : public HmcObservable<typename Impl::Field> {
                                  GridSerialRNG &sRNG,
                                  GridParallelRNG &pRNG) = 0;
 
+  virtual void Checkpoint5DTo4DConvert(int traj, typename Impl::Field &U,
+				       GridSerialRNG &sRNG,
+				       GridParallelRNG &pRNG) = 0;
+  
 };  // class BaseHmcCheckpointer
 ///////////////////////////////////////////////////////////////////////////////
 }

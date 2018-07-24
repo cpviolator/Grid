@@ -112,6 +112,22 @@ public:
     set_rb(SpaceTimeGrid::makeFourDimRedBlackGrid(grid_.get()));
   }
 
+  //DMH
+  // Construct a 5D grid using command line input.
+  GridFourDimModule(bool FiveD)
+  {
+    if(FiveD) {
+      using namespace QCD;
+      std::vector<int> simd = GridDefaultSimd(Nd-1,vComplex::Nsimd());
+      simd.push_back(1);
+      set_full(SpaceTimeGrid::makeFourDimGrid(GridDefaultLatt(),
+					      simd,
+					      GridDefaultMpi()));
+    } else {
+      GridFourDimModule();
+    }
+  }
+  
   GridFourDimModule(const std::vector<int> tweak_simd)
   {
     using namespace QCD;

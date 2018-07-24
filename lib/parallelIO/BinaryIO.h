@@ -490,7 +490,21 @@ PARALLEL_CRITICAL
 	}
 
 	try {
-	  fout.write((char *)&iodata[0],iodata.size()*sizeof(fobj));//assert( fout.fail()==0);
+
+	  //DMH
+          if(grid->_ndimension == 4) {
+	    //A 4D grid has been passed to the write function.	  
+            int FourDimSize = 1;
+            for(int i=0; i<4; i++) FourDimSize *= grid->_fdimensions[i];
+
+	    //It's 4/5ths of every iodata[i] element because the 5th dimension links
+            //are always accessed in this 5D build of Grid.	    
+            for(int i=0; i<FourDimSize; i++ ) fout.write((char *)&iodata[i],(4*sizeof(fobj))/5);
+	    
+          } else {
+            //Write the full 5D lattice
+            fout.write((char *)&iodata[0], iodata.size()*sizeof(fobj) );	   
+          }
 	}
 	catch (const std::fstream::failure& exc) {
 	  std::cout << "Exception in writing file " << file << std::endl;

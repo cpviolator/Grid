@@ -84,12 +84,15 @@ class HMCWrapperTemplate: public HMCRunnerBase<ReaderClass> {
     if (GridCmdOptionExists(argv, argv + argc, "--StartingType")) {
       arg = GridCmdOptionPayload(argv, argv + argc, "--StartingType");
 
-      if (arg != "HotStart" && arg != "ColdStart" && arg != "TepidStart" &&
-          arg != "CheckpointStart") {
+      if (arg != "HotStart" &&
+	  arg != "ColdStart" &&
+	  arg != "TepidStart" &&
+          arg != "CheckpointStart" &&
+	  arg != "CheckpointConvert") {
         std::cout << GridLogError << "Unrecognized option in --StartingType\n";
         std::cout
-            << GridLogError
-            << "Valid [HotStart, ColdStart, TepidStart, CheckpointStart]\n";
+	  << GridLogError
+	  << "Valid [HotStart, ColdStart, TepidStart, CheckpointStart, CheckpointConvert]\n";
         exit(1);
       }
       Parameters.StartingType = arg;
@@ -162,8 +165,19 @@ class HMCWrapperTemplate: public HMCRunnerBase<ReaderClass> {
       Resources.GetCheckPointer()->CheckpointRestore(Parameters.StartTrajectory, U,
                                    Resources.GetSerialRNG(),
                                    Resources.GetParallelRNG());
+    } else if (Parameters.StartingType == "CheckpointConvert") {
+      // CheckpointConvert
+      int start = Parameters.StartTrajectory;
+      int skip  = 10;//CPparams.saveInterval;
+      int total = Parameters.Trajectories/skip + 1;
+      for(int i=0; i<total; i++) {
+	Resources.GetCheckPointer()->Checkpoint5DTo4DConvert(start + i*skip, U,
+							     Resources.GetSerialRNG(),
+							     Resources.GetParallelRNG());
+      }
+      Grid_finalize();
     }
-
+    
     Smearing.set_Field(U);
 
     HybridMonteCarlo<TheIntegrator> HMC(Parameters, MDynamics,
