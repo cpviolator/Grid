@@ -21,20 +21,23 @@ SEED_PARALLEL="6 91 2 12 98"
 
 TRAJ=20
 THERM=10
-SKIP=10
+RECORD=10
 START=10
 
-LOG='Integrator'
-START_TYPE='CheckpointConvert'
+HMC_STEP_SIZE=20
+HMC_TRAJ_LENGTH=1.0
 
-COMMAND="./Test_hmc_WilsonGauge ${SEED_SERIAL} ${SEED_PARALLEL} ${BETA} {SKIP} 
+LOG='Integrator'
+START_TYPE='CheckpointStart'
+
+COMMAND="./Test_hmc_WilsonGauge ${SEED_SERIAL} ${SEED_PARALLEL} 
+				${BETA} ${RECORD} ${HMC_STEP_SIZE} ${HMC_TRAJ_LENGTH}
 				--grid ${LX}.${LY}.${LZ}.${LT}.${LS} 
 				--mpi ${MPIX}.${MPIY}.${MPIZ}.${MPIT}.${MPIS} 
 	        	       	--Trajectories ${TRAJ} 
 				--Thermalizations ${THERM} 
-				--log ${LOG} 
-                                --StartingTrajectory ${START}
-				--StartingType ${START_TYPE}"
+				--log ${LOG} "
+#                                                  --StartingTrajectory ${START} --StartingType ${START_TYPE}"
 
 echo ""
 echo "Command given:"

@@ -49,28 +49,36 @@ int main(int argc, char **argv) {
 
   // DMH: Get information about the 5D grid.
   auto UGrid = TheHMC.Resources.GetCartesian("gauge");
+   
+  RNGModuleParameters RNGpar;
+  for(int i=0; i<5; i++) {
+    RNGpar.serial_seeds   += std::to_string(atoi(argv[i])) + " ";
+    RNGpar.parallel_seeds += std::to_string(atoi(argv[i+5])) + " ";
+  }
   
+  TheHMC.Resources.SetRNGSeeds(RNGpar);
+  
+  RealD Beta = 4.95; //DMH: A default value
+  Beta = atof(argv[11]);
+
   // Checkpointer definition
   CheckpointerParameters CPparams;  
   CPparams.config_prefix = "ckpoint_lat";
   CPparams.rng_prefix = "ckpoint_rng";
-  CPparams.saveInterval = 10;
+  CPparams.saveInterval = atoi(argv[12]);
   CPparams.format = "IEEE64BIG";
   
   //DMH: Binary data is simpler to hack.
   TheHMC.Resources.LoadBinaryCheckpointer(CPparams);
-
-  RNGModuleParameters RNGpar;
-  RNGpar.serial_seeds = "1 2 3 4 5";
-  RNGpar.parallel_seeds = "6 7 8 9 10";
-  TheHMC.Resources.SetRNGSeeds(RNGpar);
-
+  
   // Construct observables
   // here there is too much indirection 
   typedef PlaquetteMod<HMCWrapper::ImplPolicy> PlaqObs;
-  typedef TopologicalChargeMod<HMCWrapper::ImplPolicy> QObs;
   TheHMC.Resources.AddObservable<PlaqObs>();
+
+  //Topology done in 4D code
   /*
+  typedef TopologicalChargeMod<HMCWrapper::ImplPolicy> QObs;
   TopologyObsParameters TopParams;
   TopParams.interval = 5;
   TopParams.do_smearing = false; //DMH: We do physics on the 4D slices
@@ -83,16 +91,11 @@ int main(int argc, char **argv) {
   //////////////////////////////////////////////
 
   // Gauge action
-  int Ls = UGrid->_fdimensions[4]; //DMH: Get the 5D extent from the Grid.
-  RealD Beta = 4.95; //DMH: A default value
-  Beta = atof(argv[1]);
-  
+  int Ls = UGrid->_fdimensions[4]; //DMH: Get the 5D extent from the Grid.  
   std::vector<RealD> betat(Ls,Beta);
   std::vector<RealD> betas(Ls,Beta);
-  betat[Ls-1]= 0.0;  // for the open boundary conditions
-  // Specify here the slab betas
-  //betas={5.2,5.5,5.8,6,6,5.8,5.5,5.2};
-  //betat={4.0, 4.5, 5.0, 5.6, 5.6, 5.0, 4.5, 4.0};
+  
+  betat[Ls-1] = 0.0;  // for the open boundary conditions
   std::cout << GridLogMessage << "Betas: " << betas << std::endl;
   std::cout << GridLogMessage << "Betat: " << betat << std::endl;
   WilsonGaugeAction5DR Waction(betas, betat, UGrid);
@@ -102,10 +105,10 @@ int main(int argc, char **argv) {
   //Level1.push_back(WGMod.getPtr());
   TheHMC.TheAction.push_back(Level1);
   /////////////////////////////////////////////////////////////
-
+  
   // HMC parameters are serialisable 
-  TheHMC.Parameters.MD.MDsteps = 20;
-  TheHMC.Parameters.MD.trajL   = 1.0;
+  TheHMC.Parameters.MD.MDsteps = atoi(argv[13]);
+  TheHMC.Parameters.MD.trajL   = atof(argv[14]);
 
   TheHMC.ReadCommandLine(argc, argv); // these can be parameters from file
 
