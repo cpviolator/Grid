@@ -31,7 +31,7 @@ LOG='Integrator'
 START_TYPE='CheckpointStart'
 
 COMMAND="mpirun -np 8 ./Test_hmc_WilsonGauge ${SEED_SERIAL} ${SEED_PARALLEL} 
-		      			     ${BETA} {RECORD} ${HMC_STEP_SIZE} 
+		      			     ${BETA} ${RECORD} ${HMC_STEP_SIZE} 
 					     ${HMC_TRAJ_LENGTH}
 					     --grid ${LX}.${LY}.${LZ}.${LT}.${LS} 
 					     --mpi ${MPIX}.${MPIY}.${MPIZ}.${MPIT}.${MPIS} 
