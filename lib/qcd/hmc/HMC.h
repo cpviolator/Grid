@@ -56,6 +56,7 @@ struct HMCparameters: Serializable {
                                   Integer, Trajectories, /* @brief Number of sweeps in this run */
                                   bool, MetropolisTest,
                                   Integer, NoMetropolisUntil,
+				  Integer, SaveInterval,
                                   std::string, StartingType,
                                   IntegratorParameters, MD)
 
@@ -63,6 +64,7 @@ struct HMCparameters: Serializable {
     ////////////////////////////// Default values
     MetropolisTest    = true;
     NoMetropolisUntil = 10;
+    SaveInterval      = 10;
     StartTrajectory   = 0;
     Trajectories      = 10;
     StartingType      = "HotStart";
@@ -84,6 +86,7 @@ struct HMCparameters: Serializable {
   void print_parameters() const {
     std::cout << GridLogMessage << "[HMC parameters] Trajectories            : " << Trajectories << "\n";
     std::cout << GridLogMessage << "[HMC parameters] Start trajectory        : " << StartTrajectory << "\n";
+    std::cout << GridLogMessage << "[HMC parameters] Save Interval           : " << SaveInterval << "\n";
     std::cout << GridLogMessage << "[HMC parameters] Metropolis test (on/off): " << std::boolalpha << MetropolisTest << "\n";
     std::cout << GridLogMessage << "[HMC parameters] Thermalization trajs    : " << NoMetropolisUntil << "\n";
     std::cout << GridLogMessage << "[HMC parameters] Starting type           : " << StartingType << "\n";

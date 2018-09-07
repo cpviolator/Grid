@@ -41,6 +41,8 @@ int main(int argc, char **argv) {
   typedef GenericHMCRunner<MinimumNorm2> HMCWrapper;  // Uses the default minimum norm
   HMCWrapper TheHMC;
 
+  TheHMC.ReadCommandLine(argc, argv); 
+
   // DMH: Construct a Five Dim Grid
   // Grid from the command line
   TheHMC.Resources.AddFiveDimGrid("gauge");
@@ -65,7 +67,7 @@ int main(int argc, char **argv) {
   CheckpointerParameters CPparams;  
   CPparams.config_prefix = "ckpoint_lat";
   CPparams.rng_prefix = "ckpoint_rng";
-  CPparams.saveInterval = atoi(argv[12]);
+  CPparams.saveInterval = TheHMC.Parameters.SaveInterval;
   CPparams.format = "IEEE64BIG";
   
   //DMH: Binary data is simpler to hack.
@@ -107,10 +109,8 @@ int main(int argc, char **argv) {
   /////////////////////////////////////////////////////////////
   
   // HMC parameters are serialisable 
-  TheHMC.Parameters.MD.MDsteps = atoi(argv[13]);
-  TheHMC.Parameters.MD.trajL   = atof(argv[14]);
-
-  TheHMC.ReadCommandLine(argc, argv); // these can be parameters from file
+  TheHMC.Parameters.MD.MDsteps = atoi(argv[12]);
+  TheHMC.Parameters.MD.trajL   = atof(argv[13]);
 
   TheHMC.Run();  // no smearing
   

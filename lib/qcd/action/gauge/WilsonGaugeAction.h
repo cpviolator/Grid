@@ -110,8 +110,8 @@ private:
       
       virtual std::string LogParameters(){
 	std::stringstream sstream;
-	sstream << GridLogMessage << "[WilsonGaugeAction5D] BetaBulk: " << b_bulk   << std::endl;
-	sstream << GridLogMessage << "[WilsonGaugeAction5D] Beta5D:"    << b_fifthD << std::endl;
+	//sstream << GridLogMessage << "[WilsonGaugeAction5D] BetaBulk: " << b_bulk   << std::endl;
+	//sstream << GridLogMessage << "[WilsonGaugeAction5D] Beta5D:"    << b_fifthD << std::endl;
 	return sstream.str();
       }
       

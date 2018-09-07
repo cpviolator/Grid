@@ -120,6 +120,14 @@ class HMCWrapperTemplate: public HMCRunnerBase<ReaderClass> {
       GridCmdOptionIntVector(arg, ivec);
       Parameters.NoMetropolisUntil = ivec[0];
     }
+
+    if (GridCmdOptionExists(argv, argv + argc, "--SaveInterval")) {
+      arg = GridCmdOptionPayload(argv, argv + argc, "--SaveInterval");
+      std::vector<int> ivec(0);
+      GridCmdOptionIntVector(arg, ivec);
+      Parameters.SaveInterval = ivec[0];
+    }
+
     if (GridCmdOptionExists(argv, argv + argc, "--ParameterFile")) {
       arg = GridCmdOptionPayload(argv, argv + argc, "--ParameterFile");
       ParameterFile = arg;
@@ -170,7 +178,7 @@ class HMCWrapperTemplate: public HMCRunnerBase<ReaderClass> {
     } else if (Parameters.StartingType == "CheckpointConvert") {
       // CheckpointConvert
       int start = Parameters.StartTrajectory;
-      int skip  = 10;//CPparams.saveInterval;
+      int skip  = Parameters.SaveInterval;
       int total = Parameters.Trajectories/skip + 1;
       for(int i=0; i<total; i++) {
 	Resources.GetCheckPointer()->Checkpoint5DTo4DConvert(start + i*skip, U,
