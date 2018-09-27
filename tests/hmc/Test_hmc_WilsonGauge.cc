@@ -54,8 +54,8 @@ int main(int argc, char **argv) {
    
   RNGModuleParameters RNGpar;
   for(int i=0; i<5; i++) {
-    RNGpar.serial_seeds   += std::to_string(atoi(argv[i])) + " ";
-    RNGpar.parallel_seeds += std::to_string(atoi(argv[i+5])) + " ";
+    RNGpar.serial_seeds   += std::to_string(atoi(argv[i+1])) + " ";
+    RNGpar.parallel_seeds += std::to_string(atoi(argv[i+1+5])) + " ";
   }
   
   TheHMC.Resources.SetRNGSeeds(RNGpar);
@@ -93,14 +93,18 @@ int main(int argc, char **argv) {
   //////////////////////////////////////////////
 
   // Gauge action
-  int Ls = UGrid->_fdimensions[4]; //DMH: Get the 5D extent from the Grid.  
-  std::vector<RealD> betat(Ls,Beta);
-  std::vector<RealD> betas(Ls,Beta);
+  int Ls = UGrid->_fdimensions[4]; //DMH: Get the 5D extent from the Grid.
+  std::vector<RealD> beta5th(Ls);
+  std::vector<RealD> beta4D(Ls);
   
-  betat[Ls-1] = 0.0;  // for the open boundary conditions
-  std::cout << GridLogMessage << "Betas: " << betas << std::endl;
-  std::cout << GridLogMessage << "Betat: " << betat << std::endl;
-  WilsonGaugeAction5DR Waction(betas, betat, UGrid);
+  for(int i=0; i<Ls; i++) {
+    beta5th[i] = atof(argv[12+i]);
+    beta4D[i] = Beta;
+  }
+
+  std::cout << GridLogMessage << "Beta5th: " << beta5th << std::endl;
+  std::cout << GridLogMessage << "Beta4D: " << beta4D << std::endl;
+  WilsonGaugeAction5DR Waction(beta4D, beta5th, UGrid);
   
   ActionLevel<HMCWrapper::Field> Level1(1);
   Level1.push_back(&Waction);
@@ -108,9 +112,9 @@ int main(int argc, char **argv) {
   TheHMC.TheAction.push_back(Level1);
   /////////////////////////////////////////////////////////////
   
-  // HMC parameters are serialisable 
-  TheHMC.Parameters.MD.MDsteps = atoi(argv[12]);
-  TheHMC.Parameters.MD.trajL   = atof(argv[13]);
+  // HMC parameters are serialisable
+  TheHMC.Parameters.MD.MDsteps = atoi(argv[12+Ls]);
+  TheHMC.Parameters.MD.trajL   = atof(argv[12+Ls+1]);
 
   TheHMC.Run();  // no smearing
   
