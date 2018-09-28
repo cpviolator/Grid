@@ -146,8 +146,12 @@ class HybridMonteCarlo {
   // Evolution
   /////////////////////////////////////////////////////////
   RealD evolve_hmc_step(Field &U) {
-    TheIntegrator.refresh(U, pRNG);  // set U and initialize P and phi's
 
+    //DMH: input U
+    //std::cout << "STARTING EVOLVE STEP" << U << std::endl;
+    
+    TheIntegrator.refresh(U, pRNG);  // set U and initialize P and phi's
+    
     RealD H0 = TheIntegrator.S(U);  // initial state action
 
     std::streamsize current_precision = std::cout.precision();
@@ -175,6 +179,9 @@ class HybridMonteCarlo {
     std::cout << GridLogMessage << "Total H after trajectory  = " << H1
 	      << "  dH = " << H1 - H0 << "\n";
     std::cout.precision(current_precision);
+
+    //DMH: output U
+    //std::cout << "ENDING EVOLVE STEP" << U << std::endl;
     
     return (H1 - H0);
   }

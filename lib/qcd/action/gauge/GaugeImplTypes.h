@@ -91,7 +91,9 @@ public:
     // specific for SU gauge fields
     LinkField Pmu(P._grid);
     Pmu = zero;
-    for (int mu = 0; mu < Nd; mu++) {
+    //DMH If in the 5th dim, set to 0
+    //for (int mu = 0; mu < Nd; mu++) { //ORIG
+    for (int mu = 0; mu < Nd-1; mu++) { //NEW
       SU<Nrepresentation>::GaussianFundamentalLieAlgebraMatrix(pRNG, Pmu);
       PokeIndex<LorentzIndex>(P, Pmu, mu);
     }
@@ -102,10 +104,15 @@ public:
   static inline void update_field(Field& P, Field& U, double ep){
     //static std::chrono::duration<double> diff;
 
+    ComplexD unit(1.0,0.0);
+    
     //auto start = std::chrono::high_resolution_clock::now();
     parallel_for(int ss=0;ss<P._grid->oSites();ss++){
-      for (int mu = 0; mu < Nd; mu++) 
+      for (int mu = 0; mu < Nd; mu++) {
         U[ss]._internal[mu] = ProjectOnGroup(Exponentiate(P[ss]._internal[mu], ep, Nexp) * U[ss]._internal[mu]);
+	//DMH If in the 5th dim, set to I
+	if(mu == Nd-1) U[ss]._internal[mu] = unit;
+      }
     }
     
     //auto end = std::chrono::high_resolution_clock::now();
@@ -116,7 +123,9 @@ public:
   static inline RealD FieldSquareNorm(Field& U){
     LatticeComplex Hloc(U._grid);
     Hloc = zero;
-    for (int mu = 0; mu < Nd; mu++) {
+    //DMH If in the 5th dim, set to 0
+    //for (int mu = 0; mu < Nd; mu++) { //ORIG
+    for (int mu = 0; mu < Nd-1; mu++) { //NEW
       auto Umu = PeekIndex<LorentzIndex>(U, mu);
       Hloc += trace(Umu * Umu);
     }

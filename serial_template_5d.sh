@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-L=4
+L=16
 LX=${L}
 LY=${L}
 LZ=${L}

@@ -138,13 +138,15 @@ private:
 	  Lattice<iScalar<vInteger> > coor(grid);
 	  
 	  LatticeCoordinate(coor, Ndim - 1);
-	  
+
+	  //Number of slices in extra dim
 	  int Nex = FullDim[Ndim - 1];
 	  assert(b_bulk.size() == Nex);
 	  assert(b_fifthD.size() == Nex);
-	  
+
+	  //populate extra dim beta in all slices
 	  beta_fifthD = zero;
-	  for (int tau = 0; tau < Nex - 1; tau++) {
+	  for (int tau = 0; tau < Nex; tau++) {
 	    temp = b_fifthD[tau];
 	    beta_fifthD = where(coor == tau, temp, beta_fifthD);
 	  }
@@ -213,10 +215,12 @@ private:
 	  int mu = Ndim - 1;
 	  for (int nu = 0; nu < mu; nu++) {
 	    WilsonLoops<Gimpl>::traceDirPlaquette(dirPlaq, U, mu, nu);
+	    //DMH
+	    //std::cout << "nu=" << nu << " beta=" << beta_fifthD << std::endl;
 	    Plaq = Plaq + (1.0 - dirPlaq * OneOnNc) * beta_fifthD;
 	  }
 	}
-
+	
 	TComplex Tp = sum(Plaq);
 	Complex p = TensorRemove(Tp);
 	RealD action = p.real();
@@ -246,13 +250,15 @@ private:
 	GaugeLinkField dSdU_mu(grid);
 	GaugeLinkField staple(grid);
 
+	//Loop over a direction
 	for (int mu = 0; mu < Ndim; mu++) {
 	  Umu = PeekIndex<LorentzIndex>(U, mu);
 	  dSdU_mu = zero;
 
+	  //Loop over an orthogonal direction
 	  for (int nu = 0; nu < Ndim; nu++) {
-	    if (nu != mu) {
-
+	    if (nu != mu && mu <Ndim-1) {
+	      
 	      if ((mu < (Ndim - 1)) && (nu < (Ndim - 1))) {
 		// Spacelike case apply beta space
 		WilsonLoops<Gimpl>::Staple(staple, U, mu, nu);
