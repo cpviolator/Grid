@@ -110,8 +110,8 @@ private:
       
       virtual std::string LogParameters(){
 	std::stringstream sstream;
-	//sstream << GridLogMessage << "[WilsonGaugeAction5D] BetaBulk: " << b_bulk   << std::endl;
-	//sstream << GridLogMessage << "[WilsonGaugeAction5D] Beta5D:"    << b_fifthD << std::endl;
+	sstream << GridLogMessage << "[WilsonGaugeAction5D] BetaBulk: " << b_bulk   << std::endl;
+	sstream << GridLogMessage << "[WilsonGaugeAction5D] Beta5D:"    << b_fifthD << std::endl;
 	return sstream.str();
       }
       
@@ -144,7 +144,8 @@ private:
 	  assert(b_fifthD.size() == Nex);
 	  
 	  beta_fifthD = zero;
-	  for (int tau = 0; tau < Nex - 1; tau++) {
+	  //DMH: check Nex - 1
+	  for (int tau = 0; tau < Nex; tau++) {
 	    temp = b_fifthD[tau];
 	    beta_fifthD = where(coor == tau, temp, beta_fifthD);
 	  }
