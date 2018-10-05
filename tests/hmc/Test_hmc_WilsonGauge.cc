@@ -60,9 +60,6 @@ int main(int argc, char **argv) {
   
   TheHMC.Resources.SetRNGSeeds(RNGpar);
   
-  RealD Beta = 4.95; //DMH: A default value
-  Beta = atof(argv[11]);
-
   // Checkpointer definition
   CheckpointerParameters CPparams;  
   CPparams.config_prefix = "ckpoint_lat";
@@ -98,8 +95,8 @@ int main(int argc, char **argv) {
   std::vector<RealD> beta4D(Ls);
   
   for(int i=0; i<Ls; i++) {
-    beta5th[i] = atof(argv[12+i]);
-    beta4D[i] = Beta;
+    beta4D[i]  = atof(argv[11+i]);	
+    beta5th[i] = atof(argv[11+Ls+i]);
   }
 
   std::cout << GridLogMessage << "Beta5th: " << beta5th << std::endl;
@@ -113,8 +110,8 @@ int main(int argc, char **argv) {
   /////////////////////////////////////////////////////////////
   
   // HMC parameters are serialisable
-  TheHMC.Parameters.MD.MDsteps = atoi(argv[12+Ls]);
-  TheHMC.Parameters.MD.trajL   = atof(argv[12+Ls+1]);
+  TheHMC.Parameters.MD.MDsteps = atoi(argv[11+2*Ls]);
+  TheHMC.Parameters.MD.trajL   = atof(argv[11+2*Ls+1]);
 
   TheHMC.Run();  // no smearing
   
